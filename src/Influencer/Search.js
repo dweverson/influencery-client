@@ -24,16 +24,21 @@ const InfluencerSearch = () => {
   });
 
   const search = (influencers) => {
+    let platformFiltered = influencers
+    if (platformString !== 'all') {
+      platformFiltered = influencers.filter((inf) => {
+        return inf.platform.name.toLowerCase().includes(platformString)
+      })
+    }      
     if (searchString !== '') {
-      return influencers.filter((inf) => {
+      return platformFiltered.filter((inf) => {
         return inf.tags.some(({name}) => name.toLowerCase().includes(searchString)) ||
         inf.primary_tag.name.toLowerCase().includes(searchString) ||
         inf.handle.toLowerCase().includes(searchString) ||
         inf.platform.name.toLowerCase().includes(searchString)
-      });
-      } else {
-        return influencers
-    }
+      })
+    } 
+    return platformFiltered
   }
 
     return (
@@ -43,7 +48,7 @@ const InfluencerSearch = () => {
             placeholder="Enter influencer handle, platform, or tag"
             type="text"
             value={searchString}
-            onChange={(e) => setSearchString(e.target.value)}
+            onChange={(e) => setSearchString(e.target.value.toLowerCase())}
           />
           <SelectInput
             value={platformString}
