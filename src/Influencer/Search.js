@@ -5,7 +5,7 @@ import styled from "styled-components";
 const InfluencerSearch = () => {
   const [influencers, setInfluencers] = useState(null);
   const [searchString, setSearchString] = useState("");
-  // const [platformString, setPlatformString] = useState("all");
+  const [platformString, setPlatformString] = useState("all");
 
   useEffect(() => {
     getInfluencers();
@@ -19,42 +19,57 @@ const InfluencerSearch = () => {
       },
     })
       .then((response) => response.json())
-      .then((data) => setInfluencers(data));
+      .then((data) => {
+      setInfluencers(data)
+  });
 
-  return (
-    <div>
-      <SearchInputContainer>
-        <SearchInput
-          placeholder="Enter influencer handle, platform, or tag"
-          type="text"
-          value={searchString}
-          onChange={(e) => setSearchString(e.target.value)}
-        />
-        {/* <SelectInput
-          value={platformString}
-          onChange={(e) => setPlatformString(e.target.value)}
-          name="platforms"
-          id="platforms"
-        >
-          <option value="all">All</option>
-          <option value="instagram">Instagram</option>
-          <option value="twitter">Twitter</option>
-          <option value="facebook">Facebook</option>
-          <option value="tiktok">Tik-Tok</option>
-          <option value="youtube">Youtube</option>
-        </SelectInput> */}
-      </SearchInputContainer>
-      <SearchContainer>
-        {!influencers && <Loader />}
-        <div>
-          {influencers?.map((inf, i) => (
-            <InfluencerCard influencer={inf} key={"inf_card_" + i} />
-          ))}
-        </div>
-      </SearchContainer>
-    </div>
-  );
-};
+  const search = (influencers) => {
+    if (searchString !== '') {
+      return influencers.filter((inf) => {
+        return inf.tags.some(({name}) => name.toLowerCase().includes(searchString)) ||
+        inf.primary_tag.name.toLowerCase().includes(searchString) ||
+        inf.handle.toLowerCase().includes(searchString) ||
+        inf.platform.name.toLowerCase().includes(searchString)
+      });
+      } else {
+        return influencers
+    }
+  }
+
+    return (
+      <div>
+        <SearchInputContainer>
+          <SearchInput
+            placeholder="Enter influencer handle, platform, or tag"
+            type="text"
+            value={searchString}
+            onChange={(e) => setSearchString(e.target.value)}
+          />
+          <SelectInput
+            value={platformString}
+            onChange={(e) => setPlatformString(e.target.value)}
+            name="platforms"
+            id="platforms"
+          >
+            <option value="all">All</option>
+            <option value="instagram">Instagram</option>
+            <option value="twitter">Twitter</option>
+            <option value="facebook">Facebook</option>
+            <option value="tiktok">Tik-Tok</option>
+            <option value="youtube">Youtube</option>
+          </SelectInput>
+        </SearchInputContainer>
+        <SearchContainer>
+          {!search(influencers) && <Loader />}
+          <div>
+            {search(influencers)?.map((inf, i) => (
+              <InfluencerCard influencer={inf} key={"inf_card_" + i} />
+            ))}
+          </div>
+        </SearchContainer>
+      </div>
+    );
+  };
 
 const SelectInput = styled.select`
   -webkit-border-radius: 20px;
